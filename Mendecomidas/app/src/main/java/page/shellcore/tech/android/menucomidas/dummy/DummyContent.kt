@@ -30,7 +30,7 @@ object DummyContent {
         }
     }
 
-    private fun addItem(item: Comida) {
+    public fun addItem(item: Comida) {
         ITEMS.add(item)
         ITEM_MAP.put(item.id, item)
     }
@@ -51,7 +51,7 @@ object DummyContent {
     /**
      * A item representing a piece of comida.
      */
-    data class Comida(var id: String = "", var nombre: String, var precio: String) {
+    data class Comida(var id: String = "", var nombre: String = "", var precio: String = "") {
         override fun toString(): String = nombre
 
         override fun equals(other: Any?): Boolean {

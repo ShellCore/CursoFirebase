@@ -9,6 +9,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import com.google.firebase.database.ChildEventListener
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 
 import page.shellcore.tech.android.menucomidas.dummy.DummyContent
@@ -41,24 +44,70 @@ class ItemListActivity : AppCompatActivity() {
         }
 
         setupRecyclerView(item_list)
+        setupOnClickListeners()
+    }
 
+    private fun setupOnClickListeners() {
         btnSave.setOnClickListener {
-            val comida = DummyContent.Comida(
-                nombre = edtName.text.toString().trim(),
-                precio = edtPrice.text.toString().trim()
-            )
-
-            val database = FirebaseDatabase.getInstance()
-            val reference = database.getReference(PATH_FOOD)
-            reference.push().setValue(comida)
-
-            edtName.setText("")
-            edtPrice.setText("")
+            saveNewFood()
         }
+    }
+
+    private fun saveNewFood() {
+        val comida = obtenerComida()
+        persisteComida(comida)
+        limpiaCamposComida()
+    }
+
+    private fun limpiaCamposComida() {
+        edtName.setText("")
+        edtPrice.setText("")
+    }
+
+    private fun persisteComida(comida: DummyContent.Comida) {
+        val database = FirebaseDatabase.getInstance()
+        val reference = database.getReference(PATH_FOOD)
+        reference.push().setValue(comida)
+    }
+
+    private fun obtenerComida(): DummyContent.Comida {
+        return DummyContent.Comida(
+            nombre = edtName.text.toString().trim(),
+            precio = edtPrice.text.toString().trim()
+        )
     }
 
     private fun setupRecyclerView(recyclerView: RecyclerView) {
         recyclerView.adapter = SimpleItemRecyclerViewAdapter(this, DummyContent.ITEMS, twoPane)
+
+        val database = FirebaseDatabase.getInstance()
+        val reference = database.getReference(PATH_FOOD)
+
+        reference.addChildEventListener(object: ChildEventListener {
+            override fun onCancelled(p0: DatabaseError) {
+            }
+
+            override fun onChildMoved(p0: DataSnapshot, p1: String?) {
+            }
+
+            override fun onChildChanged(p0: DataSnapshot, p1: String?) {
+            }
+
+            override fun onChildAdded(dataSnapshot: DataSnapshot, s: String?) {
+                val comida = dataSnapshot.getValue(DummyContent.Comida::class.java)
+                comida!!.id = dataSnapshot.key.toString()
+
+                if (!DummyContent.ITEMS.contains(comida)) {
+                    DummyContent.addItem(comida)
+                }
+
+                recyclerView.adapter!!.notifyDataSetChanged()
+            }
+
+            override fun onChildRemoved(p0: DataSnapshot) {
+            }
+
+        })
     }
 
     class SimpleItemRecyclerViewAdapter(
@@ -100,7 +149,7 @@ class ItemListActivity : AppCompatActivity() {
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val item = values[position]
-            holder.idView.text = item.id
+            holder.idView.text = "$${item.precio}"
             holder.contentView.text = item.nombre
 
             with(holder.itemView) {
