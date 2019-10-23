@@ -9,26 +9,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import com.google.firebase.database.FirebaseDatabase
 
 import page.shellcore.tech.android.menucomidas.dummy.DummyContent
 import kotlinx.android.synthetic.main.activity_item_list.*
 import kotlinx.android.synthetic.main.item_list_content.view.*
 import kotlinx.android.synthetic.main.item_list.*
 
-/**
- * An activity representing a list of Pings. This activity
- * has different presentations for handset and tablet-size devices. On
- * handsets, the activity presents a list of items, which when touched,
- * lead to a [ItemDetailActivity] representing
- * item precio. On tablets, the activity presents the list of items and
- * item precio side-by-side using two vertical panes.
- */
 class ItemListActivity : AppCompatActivity() {
 
-    /**
-     * Whether or not the activity is in two-pane mode, i.e. running on a tablet
-     * device.
-     */
+    companion object {
+        const val PATH_FOOD = "food"
+    }
+
     private var twoPane: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,14 +37,24 @@ class ItemListActivity : AppCompatActivity() {
         }
 
         if (item_detail_container != null) {
-            // The detail container view will be present only in the
-            // large-screen layouts (res/values-w900dp).
-            // If this view is present, then the
-            // activity should be in two-pane mode.
             twoPane = true
         }
 
         setupRecyclerView(item_list)
+
+        btnSave.setOnClickListener {
+            val comida = DummyContent.Comida(
+                nombre = edtName.text.toString().trim(),
+                precio = edtPrice.text.toString().trim()
+            )
+
+            val database = FirebaseDatabase.getInstance()
+            val reference = database.getReference(PATH_FOOD)
+            reference.push().setValue(comida)
+
+            edtName.setText("")
+            edtPrice.setText("")
+        }
     }
 
     private fun setupRecyclerView(recyclerView: RecyclerView) {
