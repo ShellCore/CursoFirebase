@@ -176,6 +176,13 @@ class ItemListActivity : AppCompatActivity() {
                 tag = item
                 setOnClickListener(onClickListener)
             }
+
+            holder.btnDelete.setOnClickListener {
+                val database = FirebaseDatabase.getInstance()
+                val reference = database.getReference(PATH_FOOD)
+                reference.child(item.id)
+                    .removeValue()
+            }
         }
 
         override fun getItemCount() = values.size
@@ -183,6 +190,7 @@ class ItemListActivity : AppCompatActivity() {
         inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             val idView: TextView = view.id_text
             val contentView: TextView = view.content
+            val btnDelete = view.btnDelete
         }
     }
 }
