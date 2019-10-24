@@ -11,28 +11,31 @@ import java.util.HashMap
  */
 object DummyContent {
 
-    /**
-     * An array of sample (dummy) items.
-     */
     val ITEMS: MutableList<Comida> = ArrayList()
 
-    /**
-     * A map of sample (dummy) items, by ID.
-     */
     val ITEM_MAP: MutableMap<String, Comida> = HashMap()
 
-    private val COUNT = 0
+    private const val COUNT = 0
 
     init {
-        // Add some sample items.
         for (i in 1..COUNT) {
             addItem(createDummyItem(i))
         }
     }
 
-    public fun addItem(item: Comida) {
+    fun addItem(item: Comida) {
         ITEMS.add(item)
         ITEM_MAP.put(item.id, item)
+    }
+
+    fun updateItem(item: Comida) {
+        ITEMS.set(ITEMS.indexOf(item), item)
+        ITEM_MAP.put(item.id, item)
+    }
+
+    fun deleteItem(item: Comida) {
+        ITEMS.remove(item)
+        ITEM_MAP.remove(item.id)
     }
 
     private fun createDummyItem(position: Int): Comida {
