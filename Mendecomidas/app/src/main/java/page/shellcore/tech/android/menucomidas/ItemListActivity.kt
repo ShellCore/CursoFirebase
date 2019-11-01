@@ -2,16 +2,16 @@ package page.shellcore.tech.android.menucomidas
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.*
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.database.ChildEventListener
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.*
 import kotlinx.android.synthetic.main.activity_item_list.*
 import kotlinx.android.synthetic.main.item_list.*
 import kotlinx.android.synthetic.main.item_list_content.view.*
@@ -21,6 +21,8 @@ class ItemListActivity : AppCompatActivity() {
 
     companion object {
         const val PATH_FOOD = "food"
+        const val PATH_CODE = "code"
+        const val PATH_PROFILE = "profile"
     }
 
     private var twoPane: Boolean = false
@@ -53,11 +55,51 @@ class ItemListActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_info -> {
-                Toast.makeText(this, "Funciona", Toast.LENGTH_SHORT).show()
+                showInfoDialog()
             }
         }
 
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun showInfoDialog() {
+        val txtCode = createTextInfoCode()
+
+        val database = FirebaseDatabase.getInstance()
+        val reference = database.getReference(PATH_PROFILE).child(PATH_CODE)
+        reference.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                txtCode.text = dataSnapshot.getValue(String::class.java)
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                Toast.makeText(
+                    this@ItemListActivity,
+                    "No se puede cargar el código",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        })
+
+        val builder = AlertDialog.Builder(this)
+            .setTitle("Mi código")
+            .setPositiveButton("Ok", null)
+
+        builder.setView(txtCode)
+        builder.show()
+    }
+
+    private fun createTextInfoCode(): TextView {
+        val txtCode = TextView(this)
+        val layoutParams = LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+
+        txtCode.layoutParams = layoutParams
+        txtCode.gravity = Gravity.CENTER
+        txtCode.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20f)
+        return txtCode
     }
 
     private fun setupOnClickListeners() {
