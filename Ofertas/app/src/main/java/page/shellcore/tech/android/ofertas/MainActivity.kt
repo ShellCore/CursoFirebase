@@ -3,9 +3,11 @@ package page.shellcore.tech.android.ofertas
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -28,6 +30,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         btnUnsubscribe.setOnClickListener(this)
 
         configureSharedPreferences()
+
+        if (FirebaseInstanceId.getInstance().token != null) {
+            Log.i("Token MainActivity", FirebaseInstanceId.getInstance().token)
+        }
     }
 
     private fun configureSharedPreferences() {

@@ -2,4 +2,6 @@
     <string name="app_name">Ofertas</string>
     <string name="normal_channel_id">channel.id.notification.normal</string>
     <string name="normal_channel_name">Oferta normal</string>
+    <string name="low_channel_id">channel.id.notification.low</string>
+    <string name="low_channel_name">Oferta baja</string>
 </resources>

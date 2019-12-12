@@ -51,8 +51,8 @@ class FcmMessagingService : FirebaseMessagingService() {
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channelId = getString(R.string.normal_channel_id)
-            val channelName = getString(R.string.normal_channel_name)
+            val channelId = if (desc < 0.1) getString(R.string.low_channel_id) else getString(R.string.normal_channel_id)
+            val channelName = if (desc < 0.1) getString(R.string.low_channel_name) else getString(R.string.normal_channel_name)
             val channel = NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_DEFAULT)
             channel.enableVibration(true)
             channel.vibrationPattern = longArrayOf(100L, 200L, 200L, 50L)
