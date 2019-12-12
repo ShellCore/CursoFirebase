@@ -4,4 +4,5 @@
     <string name="title_camera">Cámara</string>
 
     <string name="gallery_btn_upload">Subir</string>
+    <string name="main_message_question_upload">¿Deseas subir esta imagen?</string>
 </resources>

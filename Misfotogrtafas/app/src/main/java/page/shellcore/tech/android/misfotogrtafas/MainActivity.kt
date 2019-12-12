@@ -1,15 +1,19 @@
 package page.shellcore.tech.android.misfotogrtafas
 
+import android.app.Activity
+import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.setupActionBarWithNavController
-import androidx.navigation.ui.setupWithNavController
-import com.google.android.material.bottomnavigation.BottomNavigationView
+import androidx.core.graphics.decodeBitmap
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.storage.StorageReference
+import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.layout_content.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -36,17 +40,45 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        val navView: BottomNavigationView = findViewById(R.id.nav_view)
 
-        val navController = findNavController(R.id.nav_host_fragment)
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-        val appBarConfiguration = AppBarConfiguration(
-            setOf(
-                R.id.navigation_home, R.id.navigation_dashboard
-            )
-        )
-        setupActionBarWithNavController(navController, appBarConfiguration)
-        navView.setupWithNavController(navController)
+        setupNavigation()
+    }
+
+    private fun setupNavigation() {
+        navMain.setOnNavigationItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.navigation_gallery -> fromGallery()
+                R.id.navigation_camera -> txtTitle.setText(R.string.title_camera)
+            }
+            false
+        }
+    }
+
+    private fun fromGallery() {
+        txtTitle.setText(R.string.title_gallery)
+        val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        startActivityForResult(intent, RC_GALLERY)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (resultCode == Activity.RESULT_OK) {
+            when (requestCode) {
+                RC_GALLERY -> setImageFromGallery(data)
+                RC_CAMERA -> {}
+            }
+        }
+    }
+
+    private fun setImageFromGallery(data: Intent?) {
+        if (data != null) {
+            mPhotoSelectedUri = data.data!!
+            val bitmap: Bitmap =
+                MediaStore.Images.Media.getBitmap(this.contentResolver, mPhotoSelectedUri)
+            imgPhoto.setImageBitmap(bitmap)
+            btnCloseImage.visibility = View.GONE
+            txtTitle.text = getString(R.string.main_message_question_upload)
+        }
     }
 }
