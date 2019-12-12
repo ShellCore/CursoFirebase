@@ -31,8 +31,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
         configureSharedPreferences()
 
-        if (FirebaseInstanceId.getInstance().token != null) {
-            Log.i("Token MainActivity", FirebaseInstanceId.getInstance().token)
+        FirebaseInstanceId.getInstance().instanceId.addOnSuccessListener {
+            Log.d("Token MainActivity", it.token)
         }
     }
 

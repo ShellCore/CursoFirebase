@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.media.RingtoneManager
 import android.os.Build
+import android.util.Log
 import androidx.core.content.ContextCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
@@ -61,5 +62,14 @@ class FcmMessagingService : FirebaseMessagingService() {
         }
 
         notificationManager.notify("", 0, notificationBuilder.build())
+    }
+
+    override fun onNewToken(token: String) {
+        super.onNewToken(token)
+        sendRegistrationToServer(token)
+    }
+
+    private fun sendRegistrationToServer(token: String) {
+        Log.d("NewToken", token)
     }
 }
