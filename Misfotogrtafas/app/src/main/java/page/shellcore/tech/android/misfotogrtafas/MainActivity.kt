@@ -7,8 +7,13 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.storage.StorageReference
 
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var mStorageReference: StorageReference
+    private lateinit var mDatabaseReference: DatabaseReference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
