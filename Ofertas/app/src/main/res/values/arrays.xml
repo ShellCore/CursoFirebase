@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="topics">
+        <item>Comidas y bebidas</item>
+        <item>Electrónica</item>
+        <item>Viajes</item>
+    </string-array>
+
+    <string-array name="topicsValues">
+        <item>food_and_drinks</item>
+        <item>electronics</item>
+        <item>travels</item>
+    </string-array>
+</resources>
