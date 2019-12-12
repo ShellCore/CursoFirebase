@@ -3,18 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_home">
+    app:startDestination="@+id/navigation_gallery">
 
     <fragment
-        android:id="@+id/navigation_home"
-        android:name="page.shellcore.tech.android.misfotogrtafas.ui.home.HomeFragment"
+        android:id="@+id/navigation_gallery"
+        android:name="page.shellcore.tech.android.misfotogrtafas.gallery.GalleryFragment"
         android:label="@string/title_gallery"
-        tools:layout="@layout/fragment_home" />
-
-    <fragment
-        android:id="@+id/navigation_dashboard"
-        android:name="page.shellcore.tech.android.misfotogrtafas.ui.dashboard.DashboardFragment"
-        android:label="@string/title_camera"
-        tools:layout="@layout/fragment_dashboard" />
+        tools:layout="@layout/fragment_gallery" />
 
 </navigation>

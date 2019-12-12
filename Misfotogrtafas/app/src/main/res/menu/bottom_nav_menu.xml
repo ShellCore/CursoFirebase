@@ -6,9 +6,4 @@
         android:icon="@drawable/ic_photo_library"
         android:title="@string/title_gallery" />
 
-    <item
-        android:id="@+id/navigation_dashboard"
-        android:icon="@drawable/ic_camera"
-        android:title="@string/title_camera" />
-
 </menu>
