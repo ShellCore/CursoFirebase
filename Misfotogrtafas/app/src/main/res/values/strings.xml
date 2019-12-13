@@ -10,4 +10,5 @@
     <string name="main_message_upload_error">Error al subir la imagen, intente más tarde</string>
     <string name="main_message_delete_success">Imagen eliminada correctamente</string>
     <string name="main_message_delete_error">Error al eliminar la imagen</string>
+    <string name="main_message_error_notFound">La imagen no se pudo cargar, ¿Añadir una?</string>
 </resources>
