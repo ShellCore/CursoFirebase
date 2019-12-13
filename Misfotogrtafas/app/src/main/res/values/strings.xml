@@ -8,4 +8,6 @@
     <string name="main_message_upload_success">Imagen subida exitosamente</string>
     <string name="main_message_done">Listo!</string>
     <string name="main_message_upload_error">Error al subir la imagen, intente más tarde</string>
+    <string name="main_message_delete_success">Imagen eliminada correctamente</string>
+    <string name="main_message_delete_error">Error al eliminar la imagen</string>
 </resources>
