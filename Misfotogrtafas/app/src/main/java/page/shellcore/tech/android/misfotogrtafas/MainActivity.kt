@@ -10,7 +10,10 @@ import android.provider.MediaStore
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.decodeBitmap
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.layout_content.*
@@ -31,8 +34,16 @@ class MainActivity : AppCompatActivity() {
         const val PATH_PHOTO_URL = "photoUrl"
     }
 
-    private lateinit var mStorageReference: StorageReference
-    private lateinit var mDatabaseReference: DatabaseReference
+    private val mStorageReference: StorageReference by lazy {
+        FirebaseStorage.getInstance().reference
+    }
+
+    private val mDatabaseReference: DatabaseReference by lazy {
+        FirebaseDatabase.getInstance()
+            .reference
+            .child(PATH_PROFILE)
+            .child(PATH_PHOTO_URL)
+    }
 
     private lateinit var mCurrentPhotoPath: String
     private lateinit var mPhotoSelectedUri: Uri
@@ -42,6 +53,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         setupNavigation()
+        setupOnClicks()
     }
 
     private fun setupNavigation() {
@@ -52,6 +64,38 @@ class MainActivity : AppCompatActivity() {
             }
             false
         }
+    }
+
+    private fun setupOnClicks() {
+        btnUpload.setOnClickListener {
+            val profileReference = mStorageReference.child(PATH_PROFILE)
+            val photoReference = profileReference.child(MY_PHOTO)
+            photoReference.putFile(mPhotoSelectedUri)
+                .continueWithTask {
+                    if (!it.isSuccessful) {
+                        it.exception?.let {
+                            throw it
+                        }
+                    }
+                    photoReference.downloadUrl
+                }.addOnCompleteListener {
+                    if (it.isSuccessful) {
+                        Snackbar.make(container, getString(R.string.main_message_upload_success), Snackbar.LENGTH_LONG)
+                            .show()
+                        val downloadUri: Uri = it.result!!
+                        savePhotoUrl(downloadUri)
+                        btnCloseImage.visibility = View.VISIBLE
+                        txtTitle.text = getString(R.string.main_message_done)
+                    } else {
+                        Snackbar.make(container, getString(R.string.main_message_upload_error), Snackbar.LENGTH_LONG)
+                            .show()
+                    }
+                }
+        }
+    }
+
+    private fun savePhotoUrl(downloadUri: Uri) {
+        mDatabaseReference.setValue(downloadUri.toString())
     }
 
     private fun fromGallery() {

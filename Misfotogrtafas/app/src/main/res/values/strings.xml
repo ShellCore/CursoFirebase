@@ -5,4 +5,7 @@
 
     <string name="gallery_btn_upload">Subir</string>
     <string name="main_message_question_upload">¿Deseas subir esta imagen?</string>
+    <string name="main_message_upload_success">Imagen subida exitosamente</string>
+    <string name="main_message_done">Listo!</string>
+    <string name="main_message_upload_error">Error al subir la imagen, intente más tarde</string>
 </resources>
