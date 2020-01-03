@@ -62,7 +62,7 @@ class MainActivity : AppCompatActivity() {
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
                 RC_GALLERY -> setImageFromGallery(data)
-                RC_CAMERA -> {}
+                RC_CAMERA -> setImageFromCamera(data)
             }
         }
     }
@@ -78,11 +78,21 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun setImageFromCamera(data: Intent?) {
+        if (data != null) {
+            val extras = data.extras
+            val bitmap = extras!!.get("data") as Bitmap
+            imgPhoto.setImageBitmap(bitmap)
+            btnCloseImage.visibility = View.GONE
+
+        }
+    }
+
     private fun setupNavigation() {
         navMain.setOnNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.navigation_gallery -> fromGallery()
-                R.id.navigation_camera -> txtTitle.setText(R.string.title_camera)
+                R.id.navigation_camera -> fromCamera()
             }
             false
         }
@@ -92,6 +102,12 @@ class MainActivity : AppCompatActivity() {
         txtTitle.setText(R.string.title_gallery)
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         startActivityForResult(intent, RC_GALLERY)
+    }
+
+    private fun fromCamera() {
+        txtTitle.setText(R.string.title_camera)
+        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        startActivityForResult(intent, RC_CAMERA)
     }
 
     private fun setupOnClicks() {
