@@ -121,7 +121,7 @@ class MainActivity : AppCompatActivity() {
         navMain.setOnNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.navigation_gallery -> checkPermissionToApp(Manifest.permission.READ_EXTERNAL_STORAGE, RP_STORAGE)
-                R.id.navigation_camera -> fromCamera()
+                R.id.navigation_camera -> checkPermissionToApp(Manifest.permission.CAMERA, RP_CAMERA)
             }
             false
         }
@@ -137,6 +137,7 @@ class MainActivity : AppCompatActivity() {
 
         when(requestPermission) {
             RP_STORAGE -> fromGallery()
+            RP_CAMERA -> fromCamera()
         }
     }
 
@@ -148,6 +149,7 @@ class MainActivity : AppCompatActivity() {
         if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             when (requestCode) {
                 RP_STORAGE -> fromGallery()
+                RP_CAMERA -> fromCamera()
             }
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
