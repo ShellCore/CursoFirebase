@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Multi login</string>
+    <string name="card_title">Identification Card</string>
+    <string name="img_user_description">User image</string>
+    <string name="lbl_name">Name:</string>
+    <string name="lbl_email">Email:</string>
+    <string name="lbl_provider">Provider:</string>
+    <string name="description_user_barcode">User barcode</string>
 </resources>
