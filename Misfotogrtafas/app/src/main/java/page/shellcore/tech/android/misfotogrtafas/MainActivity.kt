@@ -4,10 +4,14 @@ import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.provider.MediaStore
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.FileProvider
+import androidx.core.graphics.decodeBitmap
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
@@ -17,6 +21,9 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.layout_content.*
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -66,16 +73,51 @@ class MainActivity : AppCompatActivity() {
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
                 RC_GALLERY -> setImageFromGallery(data)
-                RC_CAMERA -> {}
+                RC_CAMERA -> setImageFromCamera(data)
             }
         }
+    }
+
+    private fun setImageFromGallery(data: Intent?) {
+        if (data != null) {
+            mPhotoSelectedUri = data.data!!
+            val bitmap: Bitmap =
+                MediaStore.Images.Media.getBitmap(this.contentResolver, mPhotoSelectedUri)
+            imgPhoto.setImageBitmap(bitmap)
+            btnCloseImage.visibility = View.GONE
+            txtTitle.setText(R.string.main_message_question_upload)
+        }
+    }
+
+    private fun setImageFromCamera(data: Intent?) {
+//        val extras = data!!.extras
+//        val bitmap = extras!!.get("data") as Bitmap
+        mPhotoSelectedUri = addPicGallery()
+        try {
+            val bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, mPhotoSelectedUri)
+            imgPhoto.setImageBitmap(bitmap)
+            btnCloseImage.visibility = View.GONE
+            txtTitle.setText(R.string.main_message_question_upload)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+    }
+
+    private fun addPicGallery(): Uri {
+        val intent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
+        val file = File(mCurrentPhotoPath)
+        val contentUri = Uri.fromFile(file)
+        intent.setData(contentUri)
+        this.sendBroadcast(intent)
+        return contentUri
     }
 
     private fun setupNavigation() {
         navMain.setOnNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.navigation_gallery -> fromGallery()
-                R.id.navigation_camera -> txtTitle.setText(R.string.title_camera)
+                R.id.navigation_camera -> fromCamera()
             }
             false
         }
@@ -85,6 +127,41 @@ class MainActivity : AppCompatActivity() {
         txtTitle.setText(R.string.title_gallery)
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         startActivityForResult(intent, RC_GALLERY)
+    }
+
+    // Función para conseguir la imágen miniatura
+//    private fun fromCamera() {
+//        txtTitle.setText(R.string.title_camera)
+//        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+//        startActivityForResult(intent, RC_CAMERA)
+//    }
+
+    private fun fromCamera() {
+        txtTitle.setText(R.string.title_camera)
+        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        if (intent.resolveActivity(packageManager) != null) {
+            val photoFile = createImageFile()
+            if (photoFile != null) {
+                val photoUri = FileProvider.getUriForFile(this, "page.shellcore.tech.android.misfotogrtafas", photoFile)
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
+                startActivityForResult(intent, RC_CAMERA)
+            }
+        }
+    }
+
+    private fun createImageFile(): File? {
+        val timeStamp = SimpleDateFormat("yyyy-MM-dd_HHmmss", Locale.ROOT)
+            .format(Date())
+        val imageFileName = "MY_PHOTO${timeStamp}_"
+        val storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        var image: File? = null
+        try {
+            image = File.createTempFile(imageFileName, ".jpg", storageDir)
+            mCurrentPhotoPath = image.absolutePath
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return image
     }
 
     private fun setupOnClicks() {
@@ -167,17 +244,6 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-    private fun setImageFromGallery(data: Intent?) {
-        if (data != null) {
-            mPhotoSelectedUri = data.data!!
-            val bitmap: Bitmap =
-                MediaStore.Images.Media.getBitmap(this.contentResolver, mPhotoSelectedUri)
-            loadImage(bitmap)
-            btnCloseImage.visibility = View.GONE
-            txtTitle.text = getString(R.string.main_message_question_upload)
-        }
-    }
-
     private fun loadImage(image: Any) {
         Glide.with(this)
             .load(image)
@@ -190,7 +256,6 @@ class MainActivity : AppCompatActivity() {
             container,
             getString(messageId),
             Snackbar.LENGTH_LONG
-        )
-            .show()
+        ).show()
     }
 }
