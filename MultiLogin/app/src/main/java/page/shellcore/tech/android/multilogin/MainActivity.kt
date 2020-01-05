@@ -8,12 +8,16 @@ import android.widget.Toast
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
     companion object {
         private const val RC_SING_IN = 123
+        private const val UNKNOWN_PROVIDER: String = "Proveedor desconocido"
+        private const val PASSWORD_FIREBASE: String = "password"
     }
+
     private val mFirebaseAuth: FirebaseAuth by lazy {
         FirebaseAuth.getInstance()
     }
@@ -22,7 +26,11 @@ class MainActivity : AppCompatActivity() {
         FirebaseAuth.AuthStateListener {
             val user: FirebaseUser? = it.currentUser
             if (user != null) {
-                // TODO
+                onSetDataUser(
+                    user.displayName!!,
+                    user.email!!,
+                    if (user.providerData.isNotEmpty()) user.providerData[1].providerId else UNKNOWN_PROVIDER
+                )
             } else {
                 startActivityForResult(
                     AuthUI.getInstance()
@@ -35,6 +43,25 @@ class MainActivity : AppCompatActivity() {
                 )
             }
         }
+    }
+
+    private fun onSetDataUser(userName: String, email: String, provider: String) {
+        txtName.text = userName
+        txtEmail.text = email
+        var provider = provider
+
+        val drawableBase: Int
+
+        when (provider) {
+            PASSWORD_FIREBASE -> drawableBase = R.drawable.ic_firebase
+            else -> {
+                drawableBase = R.drawable.ic_unknown
+//                provider = UNKNOWN_PROVIDER
+            }
+        }
+
+        txtProvider.setCompoundDrawablesRelativeWithIntrinsicBounds(drawableBase, 0, 0, 0)
+        txtProvider.text = provider
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
