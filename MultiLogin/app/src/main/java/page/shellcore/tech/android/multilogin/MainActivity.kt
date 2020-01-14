@@ -23,6 +23,7 @@ class MainActivity : AppCompatActivity() {
         private const val RC_SING_IN = 123
         private const val UNKNOWN_PROVIDER: String = "Proveedor desconocido"
         private const val PASSWORD_FIREBASE: String = "password"
+        private const val FACEBOOK: String = "facebook.com"
     }
 
     private val mFirebaseAuth: FirebaseAuth by lazy {
@@ -40,11 +41,18 @@ class MainActivity : AppCompatActivity() {
                 )
             } else {
                 onSignedOutCleanup()
+
+                val facebookIdp = AuthUI.IdpConfig.FacebookBuilder()
+                    .setPermissions(listOf("user_friends", "user_gender"))
+                    .build()
+
                 startActivityForResult(
                     AuthUI.getInstance()
                         .createSignInIntentBuilder()
                         .setIsSmartLockEnabled(false)
-                        .setAvailableProviders(arrayListOf(AuthUI.IdpConfig.EmailBuilder().build()))
+                        .setAvailableProviders(arrayListOf(
+                            AuthUI.IdpConfig.EmailBuilder().build(),
+                            facebookIdp))
                         .build(),
                     RC_SING_IN
                 )
@@ -62,6 +70,7 @@ class MainActivity : AppCompatActivity() {
 
         val drawableBase: Int = when (provider) {
             PASSWORD_FIREBASE -> R.drawable.ic_firebase
+            FACEBOOK -> R.drawable.ic_facebook
             else -> {
                 R.drawable.ic_unknown
     //                provider = UNKNOWN_PROVIDER
