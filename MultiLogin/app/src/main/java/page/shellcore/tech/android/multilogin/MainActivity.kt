@@ -10,6 +10,9 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.RequestOptions
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -39,6 +42,15 @@ class MainActivity : AppCompatActivity() {
                     user.email!!,
                     if (user.providerData.isNotEmpty()) user.providerData[1].providerId else UNKNOWN_PROVIDER
                 )
+
+                val options = RequestOptions()
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .centerCrop()
+
+                Glide.with(this)
+                    .load(user.photoUrl)
+                    .apply(options)
+                    .into(imgUser)
             } else {
                 onSignedOutCleanup()
 
