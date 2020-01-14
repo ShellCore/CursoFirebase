@@ -3,8 +3,10 @@ package page.shellcore.tech.android.multilogin
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Base64
 import android.util.Log
 import android.view.Menu
@@ -16,6 +18,8 @@ import com.bumptech.glide.request.RequestOptions
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.UserProfileChangeRequest
+import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.activity_main.*
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
@@ -24,9 +28,12 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         private const val RC_SING_IN = 123
+        private const val RC_FROM_GALLERY = 124
         private const val UNKNOWN_PROVIDER: String = "Proveedor desconocido"
         private const val PASSWORD_FIREBASE: String = "password"
         private const val FACEBOOK: String = "facebook.com"
+        private const val PATH_PROFILE = "profile"
+        private const val MY_PHOTO_AUTH = "my_photo_auth"
     }
 
     private val mFirebaseAuth: FirebaseAuth by lazy {
@@ -43,14 +50,7 @@ class MainActivity : AppCompatActivity() {
                     if (user.providerData.isNotEmpty()) user.providerData[1].providerId else UNKNOWN_PROVIDER
                 )
 
-                val options = RequestOptions()
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .centerCrop()
-
-                Glide.with(this)
-                    .load(user.photoUrl)
-                    .apply(options)
-                    .into(imgUser)
+                loadImage(user.photoUrl)
             } else {
                 onSignedOutCleanup()
 
@@ -62,9 +62,12 @@ class MainActivity : AppCompatActivity() {
                     AuthUI.getInstance()
                         .createSignInIntentBuilder()
                         .setIsSmartLockEnabled(false)
-                        .setAvailableProviders(arrayListOf(
-                            AuthUI.IdpConfig.EmailBuilder().build(),
-                            facebookIdp))
+                        .setAvailableProviders(
+                            arrayListOf(
+                                AuthUI.IdpConfig.EmailBuilder().build(),
+                                facebookIdp
+                            )
+                        )
                         .build(),
                     RC_SING_IN
                 )
@@ -85,7 +88,7 @@ class MainActivity : AppCompatActivity() {
             FACEBOOK -> R.drawable.ic_facebook
             else -> {
                 R.drawable.ic_unknown
-    //                provider = UNKNOWN_PROVIDER
+                //                provider = UNKNOWN_PROVIDER
             }
         }
 
@@ -98,7 +101,10 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         try {
-            val info = packageManager.getPackageInfo("page.shellcore.tech.android.multilogin", PackageManager.GET_SIGNATURES)
+            val info = packageManager.getPackageInfo(
+                "page.shellcore.tech.android.multilogin",
+                PackageManager.GET_SIGNATURES
+            )
             info.signatures.forEach {
                 val md = MessageDigest.getInstance("SHA")
                 md.update(it.toByteArray())
@@ -109,19 +115,70 @@ class MainActivity : AppCompatActivity() {
         } catch (ex: NoSuchAlgorithmException) {
             ex.printStackTrace()
         }
+
+        imgUser.setOnClickListener {
+            val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+            startActivityForResult(intent, RC_FROM_GALLERY)
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == RC_SING_IN) {
-            if (resultCode == Activity.RESULT_OK) {
-                Toast.makeText(this, "Bienvenido...", Toast.LENGTH_SHORT)
-                    .show()
-            } else {
-                Toast.makeText(this, "Algo falló, intente nuevamente", Toast.LENGTH_SHORT)
-                    .show()
+        when (requestCode) {
+            RC_SING_IN -> {
+                if (resultCode == Activity.RESULT_OK) {
+                    Toast.makeText(this, "Bienvenido...", Toast.LENGTH_SHORT)
+                        .show()
+                } else {
+                    Toast.makeText(this, "Algo falló, intente nuevamente", Toast.LENGTH_SHORT)
+                        .show()
+                }
+            }
+            RC_FROM_GALLERY -> {
+                if (resultCode == Activity.RESULT_OK) {
+                    val storage = FirebaseStorage.getInstance()
+                    val reference = storage.reference
+                        .child(PATH_PROFILE)
+                        .child(MY_PHOTO_AUTH)
+                    val selectedImageUri = data!!.data
+                    if (selectedImageUri != null) {
+                        reference.putFile(selectedImageUri)
+                            .addOnSuccessListener {
+                                reference.downloadUrl
+                                    .addOnSuccessListener {uri ->
+                                        val user = FirebaseAuth.getInstance()
+                                            .currentUser
+                                        if (user != null) {
+                                            val request = UserProfileChangeRequest.Builder()
+                                                .setPhotoUri(uri)
+                                                .build()
+                                            user.updateProfile(request)
+                                                .addOnCompleteListener {
+                                                    if (it.isSuccessful) {
+                                                        loadImage(user.photoUrl)
+                                                    }
+                                                }
+                                        }
+                                    }
+                            }.addOnFailureListener {
+                                Toast.makeText(this, "Error...", Toast.LENGTH_SHORT)
+                                    .show()
+                            }
+                    }
+                }
             }
         }
+    }
+
+    private fun loadImage(photoUrl: Uri?) {
+        val options = RequestOptions()
+            .diskCacheStrategy(DiskCacheStrategy.ALL)
+            .centerCrop()
+
+        Glide.with(this)
+            .load(photoUrl)
+            .apply(options)
+            .into(imgUser)
     }
 
     override fun onResume() {
@@ -141,7 +198,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when(item.itemId) {
+        return when (item.itemId) {
             R.id.actionSignOut -> {
                 AuthUI.getInstance().signOut(this)
                 true
