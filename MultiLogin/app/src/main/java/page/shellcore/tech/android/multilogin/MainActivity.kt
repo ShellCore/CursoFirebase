@@ -68,6 +68,9 @@ class MainActivity : AppCompatActivity() {
                                 facebookIdp
                             )
                         )
+                        .setLogo(R.mipmap.ic_launcher)
+                        .setTosAndPrivacyPolicyUrls("http://www.google.com", "http://www.google.com")
+                        .setTheme(R.style.GreenTheme)
                         .build(),
                     RC_SING_IN
                 )
