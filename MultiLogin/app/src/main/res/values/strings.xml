@@ -6,4 +6,5 @@
     <string name="lbl_email">Email:</string>
     <string name="lbl_provider">Provider:</string>
     <string name="description_user_barcode">User barcode</string>
+    <string name="menu_sign_out">Sign out</string>
 </resources>

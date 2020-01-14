@@ -4,6 +4,8 @@ import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Toast
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
@@ -32,11 +34,11 @@ class MainActivity : AppCompatActivity() {
                     if (user.providerData.isNotEmpty()) user.providerData[1].providerId else UNKNOWN_PROVIDER
                 )
             } else {
+                onSignedOutCleanup()
                 startActivityForResult(
                     AuthUI.getInstance()
                         .createSignInIntentBuilder()
                         .setIsSmartLockEnabled(false)
-                        .setTosUrl("http://www.google.com")
                         .setAvailableProviders(arrayListOf(AuthUI.IdpConfig.EmailBuilder().build()))
                         .build(),
                     RC_SING_IN
@@ -45,18 +47,19 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun onSignedOutCleanup() {
+        onSetDataUser("", "", "")
+    }
+
     private fun onSetDataUser(userName: String, email: String, provider: String) {
         txtName.text = userName
         txtEmail.text = email
-        var provider = provider
 
-        val drawableBase: Int
-
-        when (provider) {
-            PASSWORD_FIREBASE -> drawableBase = R.drawable.ic_firebase
+        val drawableBase: Int = when (provider) {
+            PASSWORD_FIREBASE -> R.drawable.ic_firebase
             else -> {
-                drawableBase = R.drawable.ic_unknown
-//                provider = UNKNOWN_PROVIDER
+                R.drawable.ic_unknown
+    //                provider = UNKNOWN_PROVIDER
             }
         }
 
@@ -90,5 +93,21 @@ class MainActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         mFirebaseAuth.removeAuthStateListener { mAuthStateListener }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        val inflater = menuInflater
+        inflater.inflate(R.menu.menu_main, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when(item.itemId) {
+            R.id.actionSignOut -> {
+                AuthUI.getInstance().signOut(this)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 }
