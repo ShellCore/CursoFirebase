@@ -7,4 +7,8 @@
     <string name="lbl_provider">Provider:</string>
     <string name="description_user_barcode">User barcode</string>
     <string name="menu_sign_out">Sign out</string>
+
+    <string name="facebook_app_id">1020463658314112</string>
+    <string name="fb_login_protocol_scheme">fb1020463658314112</string>
+
 </resources>

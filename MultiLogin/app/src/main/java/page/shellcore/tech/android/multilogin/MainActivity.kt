@@ -2,8 +2,11 @@ package page.shellcore.tech.android.multilogin
 
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Base64
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
@@ -11,6 +14,8 @@ import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.android.synthetic.main.activity_main.*
+import java.security.MessageDigest
+import java.security.NoSuchAlgorithmException
 
 class MainActivity : AppCompatActivity() {
 
@@ -70,6 +75,19 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        try {
+            val info = packageManager.getPackageInfo("page.shellcore.tech.android.multilogin", PackageManager.GET_SIGNATURES)
+            info.signatures.forEach {
+                val md = MessageDigest.getInstance("SHA")
+                md.update(it.toByteArray())
+                Log.d("KeyHash", Base64.encodeToString(md.digest(), Base64.DEFAULT))
+            }
+        } catch (ex: PackageManager.NameNotFoundException) {
+            ex.printStackTrace()
+        } catch (ex: NoSuchAlgorithmException) {
+            ex.printStackTrace()
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
