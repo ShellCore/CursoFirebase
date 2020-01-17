@@ -32,6 +32,7 @@ class MainActivity : AppCompatActivity() {
         private const val UNKNOWN_PROVIDER: String = "Proveedor desconocido"
         private const val PASSWORD_FIREBASE: String = "password"
         private const val FACEBOOK: String = "facebook.com"
+        private const val GOOGLE: String = "google.com"
         private const val PATH_PROFILE = "profile"
         private const val MY_PHOTO_AUTH = "my_photo_auth"
     }
@@ -58,6 +59,9 @@ class MainActivity : AppCompatActivity() {
                     .setPermissions(listOf("user_friends", "user_gender"))
                     .build()
 
+                val googleIdp = AuthUI.IdpConfig.GoogleBuilder()
+                    .build()
+
                 startActivityForResult(
                     AuthUI.getInstance()
                         .createSignInIntentBuilder()
@@ -65,7 +69,8 @@ class MainActivity : AppCompatActivity() {
                         .setAvailableProviders(
                             arrayListOf(
                                 AuthUI.IdpConfig.EmailBuilder().build(),
-                                facebookIdp
+                                facebookIdp,
+                                googleIdp
                             )
                         )
                         .setLogo(R.mipmap.ic_launcher)
@@ -89,6 +94,7 @@ class MainActivity : AppCompatActivity() {
         val drawableBase: Int = when (provider) {
             PASSWORD_FIREBASE -> R.drawable.ic_firebase
             FACEBOOK -> R.drawable.ic_facebook
+            GOOGLE -> R.drawable.ic_google
             else -> {
                 R.drawable.ic_unknown
                 //                provider = UNKNOWN_PROVIDER
