@@ -53,8 +53,8 @@ class MainActivity : AppCompatActivity() {
             val user: FirebaseUser? = it.currentUser
             if (user != null) {
                 onSetDataUser(
-                    user.displayName!!,
-                    user.email!!,
+                    user.displayName?:"",
+                    user.email?:"",
                     if (user.providerData.isNotEmpty()) user.providerData[1].providerId else UNKNOWN_PROVIDER
                 )
 
@@ -71,6 +71,7 @@ class MainActivity : AppCompatActivity() {
 
                 val customLayout = AuthMethodPickerLayout.Builder(R.layout.layout_login_custom)
                     .setEmailButtonId(R.id.btnEmail)
+                    .setPhoneButtonId(R.id.btnPhone)
                     .setGoogleButtonId(R.id.btnGoogle)
                     .setFacebookButtonId(R.id.btnFacebook)
                     .setTosAndPrivacyPolicyId(R.id.txtPolicy)
@@ -83,6 +84,7 @@ class MainActivity : AppCompatActivity() {
                         .setAvailableProviders(
                             arrayListOf(
                                 AuthUI.IdpConfig.EmailBuilder().build(),
+                                AuthUI.IdpConfig.PhoneBuilder().build(),
                                 facebookIdp,
                                 googleIdp
                             )
