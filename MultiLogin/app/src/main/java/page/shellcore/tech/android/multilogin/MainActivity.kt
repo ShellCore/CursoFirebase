@@ -3,6 +3,8 @@ package page.shellcore.tech.android.multilogin
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -23,8 +25,11 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.activity_main.*
+import java.io.ByteArrayOutputStream
+import java.lang.Exception
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
+import kotlin.math.max
 
 class MainActivity : AppCompatActivity() {
 
@@ -83,7 +88,10 @@ class MainActivity : AppCompatActivity() {
                             )
                         )
                         .setLogo(R.mipmap.ic_launcher)
-                        .setTosAndPrivacyPolicyUrls("http://www.google.com", "http://www.google.com")
+                        .setTosAndPrivacyPolicyUrls(
+                            "http://www.google.com",
+                            "http://www.google.com"
+                        )
                         .setTheme(R.style.GreenTheme)
                         .setAuthMethodPickerLayout(customLayout)
                         .build(),
@@ -157,44 +165,117 @@ class MainActivity : AppCompatActivity() {
                 if (resultCode == Activity.RESULT_OK) {
                     progressBar.visibility = View.VISIBLE
 
-                    val storage = FirebaseStorage.getInstance()
-                    val reference = storage.reference
-                        .child(PATH_PROFILE)
-                        .child(MY_PHOTO_AUTH)
-                    val selectedImageUri = data!!.data
-                    if (selectedImageUri != null) {
-                        reference.putFile(selectedImageUri)
-                            .addOnProgressListener {
-                                val progress = (100 * it.bytesTransferred) / it.totalByteCount
-                                progressBar.progress = progress.toInt()
-                            }
-                            .addOnCompleteListener {
-                                progressBar.visibility = View.INVISIBLE
-                            }
-                            .addOnSuccessListener {
-                                reference.downloadUrl
-                                    .addOnSuccessListener {uri ->
-                                        val user = FirebaseAuth.getInstance()
-                                            .currentUser
-                                        if (user != null) {
-                                            val request = UserProfileChangeRequest.Builder()
-                                                .setPhotoUri(uri)
-                                                .build()
-                                            user.updateProfile(request)
-                                                .addOnCompleteListener {
-                                                    if (it.isSuccessful) {
-                                                        loadImage(user.photoUrl)
-                                                    }
-                                                }
-                                        }
-                                    }
-                            }.addOnFailureListener {
-                                Toast.makeText(this, "Error...", Toast.LENGTH_SHORT)
-                                    .show()
-                            }
-                    }
+                    uploadImageTask(data!!.data)
+//                    uploadImageFile(data!!.data)
                 }
             }
+        }
+    }
+
+    private fun uploadImageTask(uri: Uri?) {
+        val storage = FirebaseStorage.getInstance()
+        val reference = storage.reference
+            .child(PATH_PROFILE)
+            .child(MY_PHOTO_AUTH)
+
+        var bitmap: Bitmap
+
+        try {
+            bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, uri)
+            bitmap = resizeBitmap(bitmap, 1024)
+            val byteArrayOutputStream = ByteArrayOutputStream()
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
+            val data = byteArrayOutputStream.toByteArray()
+
+            val uploadTask = reference.putBytes(data)
+            uploadTask.addOnProgressListener {
+                val progress = (100 * it.bytesTransferred) / it.totalByteCount
+                progressBar.progress = progress.toInt()
+            }
+                .addOnCompleteListener {
+                    progressBar.visibility = View.INVISIBLE
+                }
+                .addOnSuccessListener {
+                    reference.downloadUrl
+                        .addOnSuccessListener { uri ->
+                            val user = FirebaseAuth.getInstance()
+                                .currentUser
+                            if (user != null) {
+                                val request = UserProfileChangeRequest.Builder()
+                                    .setPhotoUri(uri)
+                                    .build()
+                                user.updateProfile(request)
+                                    .addOnCompleteListener {
+                                        if (it.isSuccessful) {
+                                            loadImage(user.photoUrl)
+                                        }
+                                    }
+                            }
+                        }
+                }.addOnFailureListener {
+                    Toast.makeText(this, "Error...", Toast.LENGTH_SHORT)
+                        .show()
+                }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun resizeBitmap(bitmap: Bitmap, maxSize: Int): Bitmap {
+        var width = bitmap.width
+        var height = bitmap.height
+
+        if (width <= maxSize && height <= maxSize) {
+            return bitmap
+        }
+
+        val bitmapRatio = width.toFloat() / height.toFloat()
+        if (bitmapRatio > 1) {
+            width = maxSize
+            height = (width / bitmapRatio).toInt()
+        } else {
+            width = (height * bitmapRatio).toInt()
+            height = maxSize
+        }
+
+        return Bitmap.createScaledBitmap(bitmap, width, height, true)
+    }
+
+    private fun uploadImageFile(uri: Uri?) {
+        val storage = FirebaseStorage.getInstance()
+        val reference = storage.reference
+            .child(PATH_PROFILE)
+            .child(MY_PHOTO_AUTH)
+        if (uri != null) {
+            reference.putFile(uri)
+                .addOnProgressListener {
+                    val progress = (100 * it.bytesTransferred) / it.totalByteCount
+                    progressBar.progress = progress.toInt()
+                }
+                .addOnCompleteListener {
+                    progressBar.visibility = View.INVISIBLE
+                }
+                .addOnSuccessListener {
+                    reference.downloadUrl
+                        .addOnSuccessListener { uri ->
+                            val user = FirebaseAuth.getInstance()
+                                .currentUser
+                            if (user != null) {
+                                val request = UserProfileChangeRequest.Builder()
+                                    .setPhotoUri(uri)
+                                    .build()
+                                user.updateProfile(request)
+                                    .addOnCompleteListener {
+                                        if (it.isSuccessful) {
+                                            loadImage(user.photoUrl)
+                                        }
+                                    }
+                            }
+                        }
+                }.addOnFailureListener {
+                    Toast.makeText(this, "Error...", Toast.LENGTH_SHORT)
+                        .show()
+                }
         }
     }
 
