@@ -11,6 +11,7 @@ import android.util.Base64
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -154,6 +155,8 @@ class MainActivity : AppCompatActivity() {
             }
             RC_FROM_GALLERY -> {
                 if (resultCode == Activity.RESULT_OK) {
+                    progressBar.visibility = View.VISIBLE
+
                     val storage = FirebaseStorage.getInstance()
                     val reference = storage.reference
                         .child(PATH_PROFILE)
@@ -161,6 +164,13 @@ class MainActivity : AppCompatActivity() {
                     val selectedImageUri = data!!.data
                     if (selectedImageUri != null) {
                         reference.putFile(selectedImageUri)
+                            .addOnProgressListener {
+                                val progress = (100 * it.bytesTransferred) / it.totalByteCount
+                                progressBar.progress = progress.toInt()
+                            }
+                            .addOnCompleteListener {
+                                progressBar.visibility = View.INVISIBLE
+                            }
                             .addOnSuccessListener {
                                 reference.downloadUrl
                                     .addOnSuccessListener {uri ->
