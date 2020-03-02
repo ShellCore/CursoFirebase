@@ -15,6 +15,7 @@ import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
+import com.firebase.ui.auth.AuthMethodPickerLayout
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -62,6 +63,13 @@ class MainActivity : AppCompatActivity() {
                 val googleIdp = AuthUI.IdpConfig.GoogleBuilder()
                     .build()
 
+                val customLayout = AuthMethodPickerLayout.Builder(R.layout.layout_login_custom)
+                    .setEmailButtonId(R.id.btnEmail)
+                    .setGoogleButtonId(R.id.btnGoogle)
+                    .setFacebookButtonId(R.id.btnFacebook)
+                    .setTosAndPrivacyPolicyId(R.id.txtPolicy)
+                    .build()
+
                 startActivityForResult(
                     AuthUI.getInstance()
                         .createSignInIntentBuilder()
@@ -76,6 +84,7 @@ class MainActivity : AppCompatActivity() {
                         .setLogo(R.mipmap.ic_launcher)
                         .setTosAndPrivacyPolicyUrls("http://www.google.com", "http://www.google.com")
                         .setTheme(R.style.GreenTheme)
+                        .setAuthMethodPickerLayout(customLayout)
                         .build(),
                     RC_SING_IN
                 )
