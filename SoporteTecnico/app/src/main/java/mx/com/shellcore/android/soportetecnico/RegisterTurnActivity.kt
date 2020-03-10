@@ -14,6 +14,14 @@ import kotlinx.android.synthetic.main.activity_registerturn.*
  */
 class RegisterTurnActivity : AppCompatActivity() {
 
+    companion object {
+        private const val F_MAIN_MESSAGE = "main_message"
+        private const val F_SHOW_NAME = "show_name"
+        private const val F_COLOR_PRIMARY = "color_primary"
+        private const val F_COLOR_TEXT_MESSAGE = "color_text_message"
+        private const val F_COLOR_BUTTON = "color_button"
+    }
+
     private var mContentView: View? = null
 
     private val firebaseRemoteConfig: FirebaseRemoteConfig by lazy {
@@ -55,6 +63,8 @@ class RegisterTurnActivity : AppCompatActivity() {
 
         firebaseRemoteConfig.setConfigSettingsAsync(configSettings)
         firebaseRemoteConfig.setDefaultsAsync(R.xml.remote_config_default)
+
+
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
