@@ -1,4 +1,4 @@
-package mx.com.shellcore.android.soportetcnico
+package mx.com.shellcore.android.soportetecnico
 
 import org.junit.Test
 
