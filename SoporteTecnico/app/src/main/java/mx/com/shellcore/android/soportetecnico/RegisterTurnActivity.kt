@@ -4,6 +4,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.view.View
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import kotlinx.android.synthetic.main.activity_registerturn.*
 
 /**
@@ -11,7 +13,16 @@ import kotlinx.android.synthetic.main.activity_registerturn.*
  * status bar and navigation/system bar) with user interaction.
  */
 class RegisterTurnActivity : AppCompatActivity() {
+
+    private var mContentView: View? = null
+
+    private val firebaseRemoteConfig: FirebaseRemoteConfig by lazy {
+        FirebaseRemoteConfig.getInstance()
+    }
+
+
     private val mHideHandler = Handler()
+
     private val mHidePart2Runnable = Runnable {
         // Delayed removal of status and navigation bar
 
@@ -33,6 +44,17 @@ class RegisterTurnActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_registerturn)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        configFirebaseRemoteConfig()
+    }
+
+    private fun configFirebaseRemoteConfig() {
+
+        val configSettings = FirebaseRemoteConfigSettings.Builder()
+            .setMinimumFetchIntervalInSeconds(3600L)
+            .build()
+
+        firebaseRemoteConfig.setConfigSettingsAsync(configSettings)
+        firebaseRemoteConfig.setDefaultsAsync(R.xml.remote_config_default)
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
