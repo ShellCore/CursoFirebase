@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">Soporte Técnico</string>
 
-    <string name="dummy_button">Dummy Button</string>
-    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="dummy_button">Request turn</string>
+    <string name="dummy_content">Welcome. Register and wait your turn. Thank you.</string>
+    <string name="hint_name">Name</string>
+    <string name="hint_phone">Phone</string>
 </resources>
