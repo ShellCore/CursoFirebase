@@ -5,4 +5,6 @@
     <string name="dummy_content">Welcome. Register and wait your turn. Thank you.</string>
     <string name="hint_name">Name</string>
     <string name="hint_phone">Phone</string>
+    <string name="registerturn_message_remote_config">Configuración remota</string>
+    <string name="registerturn_message_local_config">Configuración local</string>
 </resources>

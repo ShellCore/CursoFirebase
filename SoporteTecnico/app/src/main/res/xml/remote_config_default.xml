@@ -2,7 +2,7 @@
 <defaultMap>
     <entry>
         <key>main_message</key>
-        <value>Bienvenido a K-Movil\\nRegistrese y espere su turno\\nGracias</value>
+        <value>Bienvenido a K-Movil.\nRegistrese y espere su turno.\nGracias.</value>
     </entry>
 
     <entry>
@@ -20,5 +20,9 @@
     <entry>
         <key>color_button</key>
         <value>#FF4081</value>
+    </entry>
+    <entry>
+        <key>color_button_text</key>
+        <value>#FFFFFF</value>
     </entry>
 </defaultMap>
