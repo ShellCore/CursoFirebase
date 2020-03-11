@@ -7,4 +7,5 @@
     <string name="hint_phone">Phone</string>
     <string name="registerturn_message_remote_config">Configuración remota</string>
     <string name="registerturn_message_local_config">Configuración local</string>
+    <string name="main_message_success">Gracias!\nTome asiento y\nnosotros lo llamaremos.</string>
 </resources>

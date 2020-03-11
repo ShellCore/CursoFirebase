@@ -1,10 +1,12 @@
 package mx.com.shellcore.android.soportetecnico
 
+import android.content.Context
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
@@ -54,6 +56,26 @@ class RegisterTurnActivity : AppCompatActivity() {
         setContentView(R.layout.activity_registerturn)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         configFirebaseRemoteConfig()
+        setupOnclicks()
+    }
+
+    private fun setupOnclicks() {
+        btnRequest.setOnClickListener {
+            hideKeyboard()
+            fullscreen_content_controls.requestFocus()
+            edtName.setText("")
+            edtPhone.setText("")
+
+            fullscreen_content.setText(R.string.main_message_success)
+        }
+    }
+
+    private fun hideKeyboard() {
+        val view = this.currentFocus
+        view?.let {
+            val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(it.windowToken, 0)
+        }
     }
 
     private fun configFirebaseRemoteConfig() {
