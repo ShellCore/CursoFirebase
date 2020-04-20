@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Soporte Técnico</string>
+
+    <string name="dummy_button">Request turn</string>
+    <string name="dummy_content">Welcome. Register and wait your turn. Thank you.</string>
+    <string name="hint_name">Name</string>
+    <string name="hint_phone">Phone</string>
+    <string name="registerturn_message_remote_config">Configuración remota</string>
+    <string name="registerturn_message_local_config">Configuración local</string>
+    <string name="main_message_success">Gracias!\nTome asiento y\nnosotros lo llamaremos.</string>
+</resources>
