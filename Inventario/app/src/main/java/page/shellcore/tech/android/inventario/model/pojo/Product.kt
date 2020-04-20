@@ -1,7 +1,6 @@
 package page.shellcore.tech.android.inventario.model.pojo
 
 import com.google.firebase.database.Exclude
-import java.net.IDN
 
 data class Product(
 

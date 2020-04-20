@@ -44,7 +44,7 @@
                 tools:text="Huevo" />
 
             <TextView
-                android:id="@+id/txtProductCantity"
+                android:id="@+id/txtProductQuantity"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
